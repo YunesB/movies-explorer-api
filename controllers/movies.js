@@ -1,0 +1,91 @@
+/* eslint-disable no-unused-vars */
+const Movie = require('../models/movie');
+const BadRequestError = require('../errors/BadRequestError');
+const ForbiddenError = require('../errors/ForbiddenError');
+const NotFoundError = require('../errors/NotFoundError');
+
+const getMovies = (req, res, next) => {
+  Movie.find({})
+    .then((movies) => {
+      if (!movies) {
+        throw new NotFoundError('Список карточек не найден');
+      }
+      res.send(movies);
+    })
+    .catch(next);
+};
+
+const createMovie = (req, res, next) => {
+  const {
+    country, director, duration,
+    year, description, image,
+    trailer, thumbnail,
+    nameRU, nameEN,
+  } = req.body;
+  const owner = req.user._id;
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailer,
+    thumbnail,
+    nameRU,
+    nameEN,
+    owner,
+  })
+    .then((movie) => {
+      if (!movie) {
+        throw new BadRequestError('Введены некорректные данные');
+      }
+      res.status(200).send(movie);
+    })
+    .catch(next);
+};
+
+const deleteMovie = (req, res, next) => {
+  Movie.findById(req.params.movieId)
+    .orFail(new NotFoundError('Список фильмов не найден'))
+    .then((movie) => {
+      if (movie.owner.toString() !== req.user._id.toString()) {
+        throw new ForbiddenError('У Вас недостаточно прав, чтобы совершить это действие');
+      }
+      Movie.findByIdAndRemove(req.params.movieId)
+        .then((data) => {
+          res.status(200).send(data);
+        });
+    })
+    .catch(next);
+};
+
+// const likeMovie = (req, res, next) => {
+//   Movie.findByIdAndUpdate(
+//     req.params.MovieId,
+//     { $addToSet: { likes: req.user._id } },
+//     { new: true },
+//   )
+//     .orFail(new NotFoundError('Указанная карточка не найдена'))
+//     .then((likesArray) => res.status(200).send(likesArray))
+//     .catch(next);
+// };
+
+// const dislikeMovie = (req, res, next) => {
+//   Movie.findByIdAndUpdate(
+//     req.params.movieId,
+//     { $pull: { likes: req.user._id } },
+//     { new: true },
+//   )
+//     .orFail(new NotFoundError('Указанная карточка не найдена'))
+//     .then((likesArray) => res.status(200).send(likesArray))
+//     .catch(next);
+// };
+
+module.exports = {
+  getMovies,
+  createMovie,
+  deleteMovie,
+  // likeMovie,
+  // dislikeMovie,
+};
