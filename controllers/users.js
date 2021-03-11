@@ -11,17 +11,6 @@ const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
-// const getUsers = (req, res, next) => {
-//   User.find({})
-//     .then((users) => {
-//       if (!users) {
-//         throw new NotFoundError('Список пользователей не найден');
-//       }
-//       res.status(200).send(users);
-//     })
-//     .catch(next);
-// };
-
 const getUserId = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
@@ -82,22 +71,6 @@ const updateUser = (req, res, next) => {
     .catch(next);
 };
 
-// const updateAvatar = (req, res, next) => {
-//   const { avatar } = req.body;
-//   User.findByIdAndUpdate(req.user._id, { avatar }, {
-//     new: true,
-//     runValidators: true,
-//   })
-//     .orFail(new Error('CastError'))
-//     .then((user) => {
-//       if (!user) {
-//         throw new BadRequestError('Введены некорректные данные');
-//       }
-//       res.status(200).send(user);
-//     })
-//     .catch(next);
-// };
-
 const login = (req, res, next) => {
   const { email, password } = req.body;
 
@@ -130,10 +103,8 @@ const login = (req, res, next) => {
 
 module.exports = {
   getUserId,
-  // getUsers,
   getUserInfo,
   createUser,
   updateUser,
-  // updateAvatar,
   login,
 };

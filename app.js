@@ -11,7 +11,8 @@ const auth = require('./middlewares/auth');
 const usersRouter = require('./routes/users');
 const moviesRouter = require('./routes/movies');
 const controller = require('./controllers/users');
-// const validateReq = require('./middlewares/validator');
+const validateReq = require('./middlewares/validator');
+const rateLimiter = require('./utils/rateLimiter');
 const notFound = require('./routes/notFound');
 
 const { PORT = 3000 } = process.env;
@@ -24,6 +25,7 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 });
 
 app.use(cors());
+app.use(rateLimiter);
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -39,10 +41,10 @@ app.use((err, req, res, next) => {
 app.use(requestLogger);
 
 app.post('/signup',
-  // validateReq.validateLogin,
+  validateReq.validateLogin,
   controller.createUser);
 app.post('/signin',
-  // validateReq.validateLogin,
+  validateReq.validateLogin,
   controller.login);
 
 app.use('/', auth, usersRouter);

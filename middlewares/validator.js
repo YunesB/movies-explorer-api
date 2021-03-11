@@ -12,20 +12,7 @@ const validateLogin = celebrate({
 const validateUserInfo = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
-  }),
-});
-
-const validateAvatarUpdate = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string()
-      .required()
-      .custom((value) => {
-        if (!validator.isURL(value)) {
-          throw new Error('Ошибка валидации. Введён не URL');
-        }
-        return value;
-      }),
+    email: Joi.string().required().email(),
   }),
 });
 
@@ -42,10 +29,14 @@ const validateUserId = celebrate({
   }),
 });
 
-const validateCardCreation = celebrate({
+const validateMovieCreation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string()
+    country: Joi.string().required().min(2).max(30),
+    director: Joi.string().required().min(2).max(30),
+    duration: Joi.number().required(),
+    year: Joi.string().required().min(2).max(5),
+    description: Joi.string().required().min(2).max(50),
+    image: Joi.string()
       .required()
       .custom((value) => {
         if (!validator.isURL(value)) {
@@ -53,13 +44,31 @@ const validateCardCreation = celebrate({
         }
         return value;
       }),
-    // owner: Joi.string(),
+    trailer: Joi.string()
+      .required()
+      .custom((value) => {
+        if (!validator.isURL(value)) {
+          throw new Error('Ошибка валидации. Введён не URL');
+        }
+        return value;
+      }),
+    thumbnail: Joi.string()
+      .required()
+      .custom((value) => {
+        if (!validator.isURL(value)) {
+          throw new Error('Ошибка валидации. Введён не URL');
+        }
+        return value;
+      }),
+    movieId: Joi.number().required(),
+    nameRU: Joi.string().required().min(1).max(30),
+    nameEN: Joi.string().required().min(1).max(30),
   }),
 });
 
-const validateCardId = celebrate({
+const validateMovieId = celebrate({
   params: Joi.object().keys({
-    cardId: Joi.string()
+    movieId: Joi.string()
       .required()
       .custom((value) => {
         if (!ObjectId.isValid(value)) {
@@ -72,9 +81,8 @@ const validateCardId = celebrate({
 
 module.exports = {
   validateUserInfo,
-  validateAvatarUpdate,
   validateUserId,
   validateLogin,
-  validateCardCreation,
-  validateCardId,
+  validateMovieCreation,
+  validateMovieId,
 };

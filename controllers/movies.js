@@ -19,7 +19,7 @@ const createMovie = (req, res, next) => {
   const {
     country, director, duration,
     year, description, image,
-    trailer, thumbnail,
+    trailer, thumbnail, movieId,
     nameRU, nameEN,
   } = req.body;
   const owner = req.user._id;
@@ -32,9 +32,10 @@ const createMovie = (req, res, next) => {
     image,
     trailer,
     thumbnail,
+    owner,
+    movieId,
     nameRU,
     nameEN,
-    owner,
   })
     .then((movie) => {
       if (!movie) {
@@ -42,7 +43,7 @@ const createMovie = (req, res, next) => {
       }
       res.status(200).send(movie);
     })
-    .catch(next);
+    .catch((err) => console.log(err));
 };
 
 const deleteMovie = (req, res, next) => {
@@ -60,32 +61,8 @@ const deleteMovie = (req, res, next) => {
     .catch(next);
 };
 
-// const likeMovie = (req, res, next) => {
-//   Movie.findByIdAndUpdate(
-//     req.params.MovieId,
-//     { $addToSet: { likes: req.user._id } },
-//     { new: true },
-//   )
-//     .orFail(new NotFoundError('Указанная карточка не найдена'))
-//     .then((likesArray) => res.status(200).send(likesArray))
-//     .catch(next);
-// };
-
-// const dislikeMovie = (req, res, next) => {
-//   Movie.findByIdAndUpdate(
-//     req.params.movieId,
-//     { $pull: { likes: req.user._id } },
-//     { new: true },
-//   )
-//     .orFail(new NotFoundError('Указанная карточка не найдена'))
-//     .then((likesArray) => res.status(200).send(likesArray))
-//     .catch(next);
-// };
-
 module.exports = {
   getMovies,
   createMovie,
   deleteMovie,
-  // likeMovie,
-  // dislikeMovie,
 };
