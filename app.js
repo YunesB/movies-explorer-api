@@ -1,21 +1,20 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const { errors } = require('celebrate');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const auth = require('./middlewares/auth');
-const usersRouter = require('./routes/users');
-const moviesRouter = require('./routes/movies');
 const controller = require('./controllers/users');
 const validateReq = require('./middlewares/validator');
+const errorHandler = require('./middlewares/errorHandler');
 const rateLimiter = require('./utils/rateLimiter');
-const notFound = require('./routes/notFound');
+const appRouter = require('./routes/index');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3007 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
@@ -26,6 +25,7 @@ mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
 
 app.use(cors());
 app.use(rateLimiter);
+app.use(helmet());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -47,24 +47,11 @@ app.post('/signin',
   validateReq.validateLogin,
   controller.login);
 
-app.use('/', auth, usersRouter);
-app.use('/', auth, moviesRouter);
-app.use('*', notFound);
+app.use('/', appRouter);
 
 app.use(errorLogger);
 app.use(errors());
-
-// eslint-disable-next-line no-unused-vars
-app.use((err, req, res, next) => {
-  const { status = 500, message } = err;
-  res
-    .status(status)
-    .send({
-      message: status === 500
-        ? 'Ошибка сервера'
-        : message,
-    });
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Success! PORT: ${PORT}`);

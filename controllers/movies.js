@@ -43,7 +43,7 @@ const createMovie = (req, res, next) => {
       }
       res.status(200).send(movie);
     })
-    .catch((err) => console.log(err));
+    .catch(next);
 };
 
 const deleteMovie = (req, res, next) => {
