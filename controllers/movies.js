@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 const Movie = require('../models/movie');
+const ERR_MESSAGE = require('../utils/constants');
 const BadRequestError = require('../errors/BadRequestError');
 const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
@@ -8,7 +9,7 @@ const getMovies = (req, res, next) => {
   Movie.find({})
     .then((movies) => {
       if (!movies) {
-        throw new NotFoundError('Список карточек не найден');
+        throw new NotFoundError(ERR_MESSAGE.MOVIE.EMPTY_LIST);
       }
       res.send(movies);
     })
@@ -39,7 +40,7 @@ const createMovie = (req, res, next) => {
   })
     .then((movie) => {
       if (!movie) {
-        throw new BadRequestError('Введены некорректные данные');
+        throw new BadRequestError(ERR_MESSAGE.BAD_REQUEST);
       }
       res.status(200).send(movie);
     })
@@ -48,10 +49,10 @@ const createMovie = (req, res, next) => {
 
 const deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
-    .orFail(new NotFoundError('Список фильмов не найден'))
+    .orFail(new NotFoundError(ERR_MESSAGE.MOVIE.INVALID_ID))
     .then((movie) => {
       if (movie.owner.toString() !== req.user._id.toString()) {
-        throw new ForbiddenError('У Вас недостаточно прав, чтобы совершить это действие');
+        throw new ForbiddenError(ERR_MESSAGE.MOVIE.FORBIDDEN_ACTION);
       }
       Movie.findByIdAndRemove(req.params.movieId)
         .then((data) => {

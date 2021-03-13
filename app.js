@@ -13,17 +13,19 @@ const validateReq = require('./middlewares/validator');
 const errorHandler = require('./middlewares/errorHandler');
 const rateLimiter = require('./utils/rateLimiter');
 const appRouter = require('./routes/index');
+const CONFIG = require('./utils/configuration');
 
-const { PORT = 3007 } = process.env;
+const { PORT = CONFIG.PORT, MONGO = CONFIG.MONGO } = process.env;
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb', {
+mongoose.connect(MONGO, {
   useNewUrlParser: true,
   useCreateIndex: true,
   useFindAndModify: false,
 });
 
 app.use(cors());
+app.use(requestLogger);
 app.use(rateLimiter);
 app.use(helmet());
 
@@ -37,8 +39,6 @@ app.use((err, req, res, next) => {
     next();
   }
 });
-
-app.use(requestLogger);
 
 app.post('/signup',
   validateReq.validateLogin,
@@ -54,5 +54,5 @@ app.use(errors());
 app.use(errorHandler);
 
 app.listen(PORT, () => {
-  console.log(`Success! PORT: ${PORT}`);
+  console.log(`Приложение запущено, PORT: ${PORT}`);
 });
