@@ -36,7 +36,7 @@ const validateMovieCreation = celebrate({
     director: Joi.string().required().min(2).max(30),
     duration: Joi.number().required(),
     year: Joi.string().required().min(2).max(5),
-    description: Joi.string().required().min(2).max(50),
+    description: Joi.string().required().min(2).max(5000),
     image: Joi.string()
       .required()
       .custom((value) => {
