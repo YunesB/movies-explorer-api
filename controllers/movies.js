@@ -6,7 +6,8 @@ const ForbiddenError = require('../errors/ForbiddenError');
 const NotFoundError = require('../errors/NotFoundError');
 
 const getMovies = (req, res, next) => {
-  Movie.find({})
+  const owner = req.user._id;
+  Movie.find({ owner })
     .then((movies) => {
       if (!movies) {
         throw new NotFoundError(ERR_MESSAGE.MOVIE.EMPTY_LIST);
@@ -44,7 +45,7 @@ const createMovie = (req, res, next) => {
       }
       res.status(200).send(movie);
     })
-    .catch(next);
+    .catch((err) => console.log(err));
 };
 
 const deleteMovie = (req, res, next) => {
