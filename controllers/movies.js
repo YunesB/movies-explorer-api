@@ -58,6 +58,7 @@ const createMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
+  console.log(req.user._id);
   Movie.findById(req.params.movieId)
     .orFail(new NotFoundError(ERR_MESSAGE.MOVIE.INVALID_ID))
     .then((movie) => {
