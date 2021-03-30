@@ -25,13 +25,12 @@ const createMovie = (req, res, next) => {
     nameRU, nameEN,
   } = req.body;
   const owner = req.user._id;
-  return Movie.find({})
-    .then((movies) => {
-      const movieIsSaved = movies.some(
-        (movie) => (movie.movieId === movieId && owner === req.user._id),
-      );
-      if (!movieIsSaved) {
-        return Movie.create({
+  Movie.findOne({ movieId, owner })
+    .then((movie) => {
+      if (movie) {
+        throw new BadRequestError(ERR_MESSAGE.MOVIE.EXSISTING_MOVIE);
+      } else {
+        Movie.create({
           country,
           director,
           duration,
@@ -45,16 +44,16 @@ const createMovie = (req, res, next) => {
           nameRU,
           nameEN,
         })
-          .then((movie) => {
-            if (!movie) {
+          .then((data) => {
+            if (!data) {
               throw new BadRequestError(ERR_MESSAGE.BAD_REQUEST);
             }
-            res.status(200).send(movie);
+            return res.status(200).send(data);
           })
           .catch(next);
       }
-      return Promise.reject(new BadRequestError(ERR_MESSAGE.MOVIE.EXSISTING_MOVIE));
     })
+
     .catch(next);
 };
 
