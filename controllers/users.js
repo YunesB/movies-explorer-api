@@ -55,7 +55,7 @@ const createUser = (req, res, next) => {
             .catch(next);
         });
     })
-    .catch(next);
+    .catch((err) => console.log(err));
 };
 
 const updateUser = (req, res, next) => {
