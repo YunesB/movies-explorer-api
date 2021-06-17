@@ -54,7 +54,8 @@ const createUser = (req, res, next) => {
             })
             .catch(next);
         });
-    });
+    })
+    .catch(next);
 };
 
 const updateUser = (req, res, next) => {
